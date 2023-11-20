@@ -4,6 +4,8 @@
 #include "material.hh"
 #include "raytracer.hh"
 #include "sphere.hh"
+#include "plane.hh"
+#include "disk.hh"
 
 int main()
 {
@@ -13,15 +15,18 @@ int main()
     auto material_center = make_shared<lambertian>(color(0.7, 0.3, 0.3));
     auto material_left = make_shared<metal>(color(0.8, 0.8, 0.8), 0.15);
     auto material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 0.9);
+    auto material_miror = make_shared<metal>(color(0.7, 0.7, 0.7), 0.05);
 
     world.add(
-        make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, material_ground));
+        make_shared<plane>(point3(0.0, -0.5, 0.0), vec3(0.0, 1.0, 0.0), material_ground));
     world.add(
         make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, material_center));
     world.add(
         make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
     world.add(
         make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
+    world.add(
+        make_shared<disk>(point3(0.0, -0.3, -1.0), unit_vector(vec3(0.0, 1.0, 0.0)), 0.6, material_miror));
 
     camera cam;
 
