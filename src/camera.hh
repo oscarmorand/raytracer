@@ -2,6 +2,7 @@
 
 #include "color.hh"
 #include "hittable.hh"
+#include "material.hh"
 #include "raytracer.hh"
 
 class camera
@@ -10,6 +11,7 @@ public:
     double aspect_ratio = 1.0;
     int image_width = 100;
     int samples_per_pixel = 10;
+    int max_depth = 10;
 
     void render(const hittable &world)
     {
@@ -24,10 +26,11 @@ public:
 
             for (int i = 0; i < image_width; i++)
             {
-                color pixel_color(0,0,0);
-                for (int sample = 0; sample < samples_per_pixel; sample++) {
+                color pixel_color(0, 0, 0);
+                for (int sample = 0; sample < samples_per_pixel; sample++)
+                {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(std::cout, pixel_color, samples_per_pixel);
             }
@@ -69,15 +72,18 @@ private:
         pixel00_loc =
             viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
     }
-    
-    vec3 pixel_sample_square() const {
+
+    vec3 pixel_sample_square() const
+    {
         auto px = -0.5 + random_double();
         auto py = -0.5 + random_double();
         return (px * pixel_delta_u) + (py * pixel_delta_v);
     }
 
-    ray get_ray(int i, int j) const {
-        auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
+    ray get_ray(int i, int j) const
+    {
+        auto pixel_center =
+            pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
         auto pixel_sample = pixel_center + pixel_sample_square();
 
         auto ray_origin = center;
@@ -93,12 +99,24 @@ private:
         return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
     }
 
-    color ray_color(const ray &r, const hittable &world)
+    color ray_color(const ray &r, int depth, const hittable &world)
     {
         hit_record rec;
-        if (world.hit(r, interval(0, infinity), rec))
+
+        if (depth <= 0)
         {
-            return 0.5 * (rec.normal + color(1, 1, 1));
+            return color(0, 0, 0);
+        }
+
+        if (world.hit(r, interval(0.001, infinity), rec))
+        {
+            ray scattered;
+            color attenuation;
+            if (rec.mat->scatter(r, rec, attenuation, scattered))
+            {
+                return attenuation * ray_color(scattered, depth - 1, world);
+            }
+            return color(0, 0, 0);
         }
 
         return background_color(r);
