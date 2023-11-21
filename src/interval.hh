@@ -38,3 +38,4 @@ public:
 
 const static interval empty(+infinity, -infinity);
 const static interval universe(-infinity, +infinity);
+const static interval kEpsilonInterval(-1e-6, 1e-6);
