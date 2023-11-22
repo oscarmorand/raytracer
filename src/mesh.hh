@@ -4,20 +4,26 @@
 #include <vector>
 
 #include "hittable.hh"
-#include "triangle.hh"
 #include "material.hh"
+#include "triangle.hh"
 
 class mesh : public hittable
 {
 public:
-    mesh()
-    {}
+    mesh(const std::string path, point3 _pos = { 0, 0, 0 },
+         vec3 _scale = { 1, 1, 1 },
+         shared_ptr<material> _mat = make_shared<lambertian>(default_mat))
+        : pos(_pos)
+        , scale(_scale)
+        , mat(_mat)
+    {
+        load(path);
+    }
 
-    /*
-    TODO
-    void load()
-    */
-   
+    void load(const std::string path);
+
+    void load_obj(const std::string path);
+
     void clear()
     {
         triangles.clear();
@@ -58,5 +64,7 @@ public:
 
 private:
     std::vector<shared_ptr<triangle>> triangles;
+    point3 pos;
+    vec3 scale;
     shared_ptr<material> mat;
 };

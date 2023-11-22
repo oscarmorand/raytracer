@@ -3,6 +3,6 @@
 
 int main()
 {
-    scene first_test_scene = scene::create_first_test_scene();
-    first_test_scene.load();
+    scene scene = scene::create_simple_square_mesh_scene();
+    scene.load();
 }

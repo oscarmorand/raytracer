@@ -57,3 +57,5 @@ private:
     color albedo;
     double fuzz;
 };
+
+const static lambertian default_mat(color(0.5, 0.5, 0.5));
